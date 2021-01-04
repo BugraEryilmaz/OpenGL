@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
+#include "linmath.h"
 #include "parser.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
