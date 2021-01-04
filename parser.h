@@ -2,6 +2,8 @@
 #define __HW1__PARSER__
 
 #include <string>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <vector>
 #include <math.h>
 
@@ -66,7 +68,8 @@ namespace parser
     struct Mesh
     {
         int material_id;
-        std::vector<Face> faces;
+        int vertexIDstart;
+        int numberofVertex;
         std::vector<Transformation> transformations;
         std::string mesh_type;
     };
@@ -81,7 +84,21 @@ namespace parser
         Vec3f ambient_light;
         std::vector<PointLight> point_lights;
         std::vector<Material> materials;
-        std::vector<Vec3f> vertex_data;
+        std::vector<GLfloat> vertex_data;           
+        //x, y, z coordinates 
+        //[vertexID*3] = x 
+        //[vertexID*3+1] = y
+        //[vertexID*3+2] = z
+        std::vector<GLuint> vertex_ids;             
+        //vertex1ID vertex2ID vertex3ID triangles
+        //[triangleID*3] = vertex1ID
+        //[triangleID*3+1] = vertex2ID
+        //[triangleID*3+2] = vertex3ID
+        std::vector<GLfloat> normal_data;
+        //x, y, z coordinates of normals 
+        //[vertexID*3] = x
+        //[vertexID*3+1] = y
+        //[vertexID*3+2] = z
         std::vector<Vec3f> translations;
         std::vector<Vec3f> scalings;
         std::vector<Vec4f> rotations;

@@ -167,10 +167,13 @@ void parser::Scene::loadFromXml(const std::string& filepath)
     //Get VertexData
     element = root->FirstChildElement("VertexData");
     stream << element->GetText() << std::endl;
-    Vec3f vertex;
-    while (!(stream >> vertex.x).eof())
+    GLfloat vertex;
+    while (!(stream >> vertex).eof())
     {
-        stream >> vertex.y >> vertex.z;
+        vertex_data.push_back(vertex);
+        stream >> vertex;
+        vertex_data.push_back(vertex);
+        stream >> vertex;
         vertex_data.push_back(vertex);
     }
     stream.clear();
@@ -223,16 +226,22 @@ void parser::Scene::loadFromXml(const std::string& filepath)
         stream.clear();
         child = element->FirstChildElement("Faces");
         stream << child->GetText() << std::endl;
-        Face face;
-        while (!(stream >> face.v0_id).eof())
+        GLuint face1;
+        GLuint face2;
+        GLuint face3;
+        int numberofFace = 0;
+        mesh.vertexIDstart = vertex_ids.size();
+        while (!(stream >> face1).eof())
         {
-            stream >> face.v1_id >> face.v2_id;
-            mesh.faces.push_back(face);
+            stream >> face2 >> face3;
+            vertex_ids.push_back(face1);
+            vertex_ids.push_back(face2);
+            vertex_ids.push_back(face3);
+            numberofFace += 3;
         }
         stream.clear();
-
+        mesh.numberofVertex = numberofFace;
         meshes.push_back(mesh);
-        mesh.faces.clear();
         element = element->NextSiblingElement("Mesh");
     }
     stream.clear();
