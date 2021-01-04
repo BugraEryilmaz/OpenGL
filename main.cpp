@@ -1,10 +1,10 @@
 #include <iostream>
+#define _USE_MATH_DEFINES
 #include <stdlib.h>
 #include <cassert>
 #include "linmath.h"
 #define GLEW_STATIC 
 #include "parser.h"
-
 //////-------- Global Variables -------/////////
 
 GLuint gpuVertexBuffer;
@@ -64,11 +64,11 @@ void drawMesh(parser::Mesh &mesh) {
     int vertexNormalSize = sizeof(GLfloat) * scene.normal_data.size();
     int vertexIDSize = sizeof(GLuint) * scene.vertex_ids.size();
 
+    parser::Camera camera = scene.camera;
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    parser::Camera camera = scene.camera;
     gluLookAt(camera.position.x, camera.position.y, camera.position.z, 
-            camera.gaze.x * camera.near_distance + camera.position.x, camera.gaze.y * camera.near_distance + camera.position.y, camera.gaze.z * camera.near_distance + camera.position.z, 
+            camera.gaze.x + camera.position.x, camera.gaze.y + camera.position.y, camera.gaze.z + camera.position.z, 
             camera.up.x, camera.up.y, camera.up.z);
     for (int i = mesh.transformations.size()-1; i>=0;i--) {
         int id = mesh.transformations[i].id;
@@ -141,15 +141,17 @@ int main(int argc, char* argv[]) {
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
     glEnable(GL_LIGHT0);
-    fov = atan2(scene.camera.near_plane.z,scene.camera.near_distance)+atan2(scene.camera.near_plane.w,scene.camera.near_distance);
+    fov = fabs(atan(scene.camera.near_plane.z/scene.camera.near_distance))+fabs(atan(scene.camera.near_plane.w/scene.camera.near_distance));
+    fov = fov * 180 / M_PI;
     aspect = scene.camera.image_width/scene.camera.image_height;
     ndist = scene.camera.near_distance;
     fdist = scene.camera.far_distance;
-    setVBOs();
-    while(!glfwWindowShouldClose(win)) {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
+        printf("%f",fov);
         gluPerspective(fov, aspect, ndist, fdist);
+    setVBOs();
+    while(!glfwWindowShouldClose(win)) {
         for (int i = 0; i < scene.meshes.size(); i++)
             drawMesh(scene.meshes[i]);
         glfwPollEvents();
