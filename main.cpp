@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <cassert>
 #include "linmath.h"
+#define GLEW_STATIC 
 #include "parser.h"
 
 //////-------- Global Variables -------/////////
@@ -9,13 +10,17 @@
 GLuint gpuVertexBuffer;
 GLuint gpuNormalBuffer;
 GLuint gpuIndexBuffer;
+double fov;
+double aspect;
+double ndist;
+double fdist;
 
 // Sample usage for reading an XML scene file
 parser::Scene scene;
 static GLFWwindow* win = NULL;
 
 static void errorCallback(int error, const char* description) {
-    fprintf(stderr, "Error: %s\n", description);
+    fprintf(stdout, "Error: %s\n", description);
 }
 
 static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -24,61 +29,82 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 }
 
 void setVBOs() {
-    
+	glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
 
-		glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
+	GLfloat* vertexPos = scene.vertex_data.data();  //vertices with xyz
 
-		GLfloat* vertexPos = scene.vertex_data.data();  //vertices with xyz
+	GLfloat* normals = scene.normal_data.data();  //triangle normal vectors
 
-		GLfloat* normals = scene.normal_data.data();  //triangle normal vectors
-
-		GLuint* indices = scene.vertex_ids.data();  //triangle vertex ids
+	GLuint* indices = scene.vertex_ids.data();  //triangle vertex ids
 		
 
-		GLuint vertexAttribBuffer, indexBuffer;
+	GLuint vertexAttribBuffer, indexBuffer;
 
-		glGenBuffers(1, &vertexAttribBuffer);
-		glGenBuffers(1, &indexBuffer);
+	glGenBuffers(1, &vertexAttribBuffer);
+	glGenBuffers(1, &indexBuffer);
 
-		assert(vertexAttribBuffer > 0 && indexBuffer > 0);
+	assert(vertexAttribBuffer > 0 && indexBuffer > 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vertexAttribBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexAttribBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 
-
-        int vertexPosSize = sizeof(GLfloat) * scene.vertex_data.size();
-        int vertexNormalSize = sizeof(GLfloat) * scene.normal_data.size();
-        int vertexIDSize = sizeof(GLuint) * scene.vertex_ids.size();
+    int vertexPosSize = sizeof(GLfloat) * scene.vertex_data.size();
+    int vertexNormalSize = sizeof(GLfloat) * scene.normal_data.size();
+    int vertexIDSize = sizeof(GLuint) * scene.vertex_ids.size();
 		
-		glBufferData(GL_ARRAY_BUFFER, vertexPosSize + vertexNormalSize, 0, GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, vertexPosSize, vertexPos);
-		glBufferSubData(GL_ARRAY_BUFFER, vertexPosSize, vertexNormalSize, normals);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIDSize, indices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexPosSize + vertexNormalSize, 0, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, vertexPosSize, vertexPos);
+	glBufferSubData(GL_ARRAY_BUFFER, vertexPosSize, vertexNormalSize, normals);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIDSize, indices, GL_STATIC_DRAW);
 }
 
 void drawMesh(parser::Mesh &mesh) {
+    int vertexPosSize = sizeof(GLfloat) * scene.vertex_data.size();
+    int vertexNormalSize = sizeof(GLfloat) * scene.normal_data.size();
+    int vertexIDSize = sizeof(GLuint) * scene.vertex_ids.size();
 
-	static bool firstTime = true;
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    parser::Camera camera = scene.camera;
+    gluLookAt(camera.position.x, camera.position.y, camera.position.z, 
+            camera.gaze.x * camera.near_distance + camera.position.x, camera.gaze.y * camera.near_distance + camera.position.y, camera.gaze.z * camera.near_distance + camera.position.z, 
+            camera.up.x, camera.up.y, camera.up.z);
+    for (int i = mesh.transformations.size()-1; i>=0;i--) {
+        int id = mesh.transformations[i].id;
+        if (mesh.transformations[i].transformation_type == "Translation") {
+            glTranslatef(scene.translations[id-1].x,scene.translations[id-1].y,scene.translations[id-1].z);
+        } else if (mesh.transformations[i].transformation_type == "Rotation") {
+            glRotatef(scene.rotations[id-1].x,scene.rotations[id-1].y,scene.rotations[id-1].z,scene.rotations[id-1].w);
+        } else if (mesh.transformations[i].transformation_type == "Scaling") {
+            glScalef(scene.scalings[id-1].x,scene.scalings[id-1].y,scene.scalings[id-1].z);
+        }
+    }
+    parser::Material material = scene.materials[mesh.material_id-1];
+    GLfloat ambColor [ 4 ] = {material.ambient.x, material.ambient.y, material.ambient.z, 1.0 } ;
+    GLfloat diffColor [ 4 ] = {material.diffuse.x, material.diffuse.y, material.diffuse.z, 1.0 } ;
+    GLfloat specColor [ 4 ] = {material.specular.x, material.specular.y, material.specular.z, 1.0 } ;
+    GLfloat specExp [ 1 ] = {material.phong_exponent};
+    glMaterialfv ( GL_FRONT , GL_AMBIENT , ambColor ) ;
+    glMaterialfv ( GL_FRONT , GL_DIFFUSE , diffColor ) ;
+    glMaterialfv ( GL_FRONT , GL_SPECULAR , specColor ) ;
+    glMaterialfv ( GL_FRONT , GL_SHININESS , specExp ) ;
+    glMaterialfv ( GL_BACK , GL_AMBIENT , ambColor ) ;
+    glMaterialfv ( GL_BACK , GL_DIFFUSE , diffColor ) ;
+    glMaterialfv ( GL_BACK , GL_SPECULAR , specColor ) ;
+    glMaterialfv ( GL_BACK , GL_SHININESS , specExp ) ;
 
-	static int vertexPosDataSizeInBytes;
-	
-	if (firstTime)
-	{
-		firstTime = false;
-	}
-
-	glVertexPointer(3, GL_FLOAT, 0, 0);
-	glColorPointer(3, GL_FLOAT, 0, reinterpret_cast<void*>(vertexPosDataSizeInBytes));
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	glVertexPointer(3, GL_FLOAT, 0, (void*)0);
+    glNormalPointer(GL_FLOAT, 0, (void*)vertexPosSize);
+	glDrawElements(GL_TRIANGLES, mesh.numberofVertex, GL_UNSIGNED_INT, (void*)(mesh.vertexIDstart*sizeof(GLuint)));
 }
 
 int main(int argc, char* argv[]) {
     scene.loadFromXml(argv[1]);
-
     glfwSetErrorCallback(errorCallback);
 
     if (!glfwInit()) {
+        printf("GLFW init problem");
         exit(EXIT_FAILURE);
     }
 
@@ -87,6 +113,7 @@ int main(int argc, char* argv[]) {
 
     win = glfwCreateWindow(scene.camera.image_width, scene.camera.image_height, "CENG477 - HW3", NULL, NULL);
     if (!win) {
+        printf("window problem");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
@@ -94,6 +121,7 @@ int main(int argc, char* argv[]) {
 
     GLenum err = glewInit();
     if (err != GLEW_OK) {
+        printf("GLEW problem");
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
         exit(EXIT_FAILURE);
     }
@@ -103,16 +131,33 @@ int main(int argc, char* argv[]) {
     //  color is determined by glmaterial code
     glEnable(GL_LIGHTING);
     glDisable(GL_COLOR_MATERIAL);
+    GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_position[] = { 0, 0, 0, 0.0 };
 
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glEnable(GL_LIGHT0);
+    fov = atan2(scene.camera.near_plane.z,scene.camera.near_distance)+atan2(scene.camera.near_plane.w,scene.camera.near_distance);
+    aspect = scene.camera.image_width/scene.camera.image_height;
+    ndist = scene.camera.near_distance;
+    fdist = scene.camera.far_distance;
+    setVBOs();
     while(!glfwWindowShouldClose(win)) {
-        glfwWaitEvents();
-
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluPerspective(fov, aspect, ndist, fdist);
+        for (int i = 0; i < scene.meshes.size(); i++)
+            drawMesh(scene.meshes[i]);
+        glfwPollEvents();
         glfwSwapBuffers(win);
     }
 
     glfwDestroyWindow(win);
     glfwTerminate();
-
     exit(EXIT_SUCCESS);
 
     return 0;

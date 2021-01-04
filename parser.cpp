@@ -175,6 +175,9 @@ void parser::Scene::loadFromXml(const std::string& filepath)
         vertex_data.push_back(vertex);
         stream >> vertex;
         vertex_data.push_back(vertex);
+        normal_data.push_back(0);
+        normal_data.push_back(0);
+        normal_data.push_back(1);
     }
     stream.clear();
 
@@ -234,9 +237,9 @@ void parser::Scene::loadFromXml(const std::string& filepath)
         while (!(stream >> face1).eof())
         {
             stream >> face2 >> face3;
-            vertex_ids.push_back(face1);
-            vertex_ids.push_back(face2);
-            vertex_ids.push_back(face3);
+            vertex_ids.push_back(face1-1);
+            vertex_ids.push_back(face2-1);
+            vertex_ids.push_back(face3-1);
             numberofFace += 3;
         }
         stream.clear();
