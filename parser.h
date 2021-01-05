@@ -57,7 +57,7 @@ struct Vec3f {
         ret.x = y * rhs.z - z * rhs.y;
         ret.y = z * rhs.x - x * rhs.z;
         ret.z = x * rhs.y - y * rhs.x;
-        return ret;
+        return ret; 
     }
     double dot(Vec3f& rhs)
     {

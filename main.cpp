@@ -66,10 +66,6 @@ void normal_vec(){
     } 
 }
 
-//glEnable(GL_CULL_FACE); 
-//glCullFace(GL_FRONT);
-//glCullFace(GL_BACK);
-
 void setVBOs() {
 	glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -105,7 +101,10 @@ void drawMesh(parser::Mesh &mesh) {
     int vertexPosSize = sizeof(GLfloat) * scene.vertex_data.size();
     int vertexNormalSize = sizeof(GLfloat) * scene.normal_data.size();
     int vertexIDSize = sizeof(GLuint) * scene.vertex_ids.size();
-
+    if (mesh.mesh_type == "Solid")
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    else if (mesh.mesh_type == "Wireframe")
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     parser::Camera camera = scene.camera;
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -131,10 +130,10 @@ void drawMesh(parser::Mesh &mesh) {
     //GLfloat diffColor [ 4 ] = {0,0,0, 1.0 } ;
     //GLfloat specColor [ 4 ] = {0,0,0, 1.0 } ;
     //GLfloat specExp [ 1 ] = {1};
-    glMaterialfv ( GL_FRONT , GL_AMBIENT , ambColor ) ;
-    glMaterialfv ( GL_FRONT , GL_DIFFUSE , diffColor ) ;
-    glMaterialfv ( GL_FRONT , GL_SPECULAR , specColor ) ;
-    glMaterialfv ( GL_FRONT , GL_SHININESS , specExp ) ;
+    glMaterialfv ( GL_FRONT_AND_BACK , GL_AMBIENT , ambColor ) ;
+    glMaterialfv ( GL_FRONT_AND_BACK , GL_DIFFUSE , diffColor ) ;
+    glMaterialfv ( GL_FRONT_AND_BACK , GL_SPECULAR , specColor ) ;
+    glMaterialfv ( GL_FRONT_AND_BACK , GL_SHININESS , specExp ) ;
 
 	glVertexPointer(3, GL_FLOAT, 0, (void*)0);
     glNormalPointer(GL_FLOAT, 0, (void*)vertexPosSize);
@@ -171,7 +170,13 @@ int main(int argc, char* argv[]) {
 
     glfwSetKeyCallback(win, keyCallback);
 
+    //glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, 1.0);
     glEnable(GL_SMOOTH);
+    glEnable(GL_DEPTH_TEST);  
+    glDisable(GL_CULL_FACE); 
+    //glCullFace(GL_FRONT);
+    //glCullFace(GL_BACK);
+
 
     //  color is determined by glmaterial code
     glEnable(GL_LIGHTING);
@@ -182,7 +187,7 @@ int main(int argc, char* argv[]) {
     glEnable(GL_LIGHT0);
     for (int i=0; i<scene.point_lights.size();i++) {
         GLfloat light_diffuse[] = { scene.point_lights[i].intensity.x, scene.point_lights[i].intensity.y, scene.point_lights[i].intensity.z, 1.0 };
-        GLfloat light_position[] = { scene.point_lights[i].position.x, scene.point_lights[i].position.y, scene.point_lights[i].position.z, 1 };
+        GLfloat light_position[] = { scene.point_lights[i].position.x, scene.point_lights[i].position.y, scene.point_lights[i].position.z, 1.0 };
 
         glLightfv(GL_LIGHT0+i+1, GL_DIFFUSE, light_diffuse);
         glLightfv(GL_LIGHT0+i+1, GL_SPECULAR, light_diffuse);
@@ -200,6 +205,7 @@ int main(int argc, char* argv[]) {
     gluPerspective(fov, aspect, ndist, fdist);
     setVBOs();
     while(!glfwWindowShouldClose(win)) {
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
         for (int i = 0; i < scene.meshes.size(); i++)
             drawMesh(scene.meshes[i]);
         glfwPollEvents();
