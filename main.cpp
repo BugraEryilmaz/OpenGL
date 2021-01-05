@@ -28,6 +28,48 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+void normal_vec(){
+    int i,j;
+    int x,y,z;
+    int counter;
+    parser::Vec3f vertex1;
+    parser::Vec3f  vertex2;
+    parser::Vec3f  vertex3;
+    parser::Vec3f triLine1, triLine2;
+    parser::Vec3f normal,sum;
+    sum.x=0;
+    sum.y=0;
+    sum.z=0;
+    for(i=0;i<scene.vertex_data.size()/3;i++){
+        counter=0;
+        for(j=0;j<scene.vertex_ids.size()/3;j++){
+            if(scene.vertex_ids[3*j]==i || scene.vertex_ids[3*j+1]==i || scene.vertex_ids[3*j+2]==i){
+                counter++;
+                vertex1.x =scene.vertex_data[scene.vertex_ids[3*j]]; //coordinate of first vertex of triangle
+                vertex1.y =scene.vertex_data[scene.vertex_ids[3*j]+1];
+                vertex1.z=scene.vertex_data[scene.vertex_ids[3*j]+2];
+                vertex2.x=scene.vertex_data[scene.vertex_ids[3*j+1]]; //coordinate of second vertex of triangle
+                vertex2.y=scene.vertex_data[scene.vertex_ids[3*j+1]+1];
+                vertex2.z=scene.vertex_data[scene.vertex_ids[3*j+1]+2];
+                vertex3.x=scene.vertex_data[scene.vertex_ids[3*j+2]]; //coordinate of third vertex of triangle
+                vertex3.y=scene.vertex_data[scene.vertex_ids[3*j+2]+1];
+                vertex3.z=scene.vertex_data[scene.vertex_ids[3*j+2]+2];
+                triLine1=vertex2-vertex1; 
+                triLine2=vertex3-vertex2;
+                normal=triLine1.cross(triLine2).normalize();
+                sum=sum+normal;
+            }
+        }
+          scene.normal_data[3*i]=sum.x/counter;
+          scene.normal_data[3*i+1]=sum.y/counter;
+          scene.normal_data[3*i+2]=sum.z/counter;
+    } 
+}
+
+//glEnable(GL_CULL_FACE); 
+//glCullFace(GL_FRONT);
+//glCullFace(GL_BACK);
+
 void setVBOs() {
 	glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);

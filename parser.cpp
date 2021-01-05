@@ -249,4 +249,7 @@ void parser::Scene::loadFromXml(const std::string& filepath)
     }
     stream.clear();
 
+    
+
+
 }
