@@ -66,6 +66,19 @@ void normal_vec(){
     } 
 }
 
+void FaceCulling() {
+    if (scene.culling_enabled == 1) {
+        glEnable(GL_CULL_FACE);
+        if (scene.culling_face == 0)
+            glCullFace(GL_BACK);
+        else
+            glCullFace(GL_FRONT);
+    }
+    else
+        glDisable(GL_CULL_FACE);
+
+}
+
 void setVBOs() {
 	glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -139,6 +152,31 @@ void drawMesh(parser::Mesh &mesh) {
     glNormalPointer(GL_FLOAT, 0, (void*)vertexPosSize);
 	glDrawElements(GL_TRIANGLES, mesh.numberofVertex, GL_UNSIGNED_INT, (void*)(mesh.vertexIDstart*sizeof(GLuint)));
 }
+
+
+double lastTime;
+int nbFrames;
+void showFPS(GLFWwindow* pWindow)
+{
+    // Measure speed
+    double currentTime = glfwGetTime();
+    double delta = currentTime - lastTime;
+    char ss[500] = {};
+    nbFrames++;
+    if (delta >= 1.0) { // If last cout was more than 1 sec ago
+        //cout << 1000.0/double(nbFrames) << endl;
+
+        double fps = ((double)(nbFrames)) / delta;
+
+        sprintf(ss, "Spheres. %lf FPS", fps);
+
+        glfwSetWindowTitle(pWindow, ss);
+
+        nbFrames = 0;
+        lastTime = currentTime;
+    }
+}
+
 
 int main(int argc, char* argv[]) {
     scene.loadFromXml(argv[1]);
