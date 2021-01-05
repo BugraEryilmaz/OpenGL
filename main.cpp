@@ -46,15 +46,15 @@ void normal_vec(){
         for(j=0;j<scene.vertex_ids.size()/3;j++){
             if(scene.vertex_ids[3*j]==i || scene.vertex_ids[3*j+1]==i || scene.vertex_ids[3*j+2]==i){
                 counter++;
-                vertex1.x =scene.vertex_data[scene.vertex_ids[3*j]]; //coordinate of first vertex of triangle
-                vertex1.y =scene.vertex_data[scene.vertex_ids[3*j]+1];
-                vertex1.z=scene.vertex_data[scene.vertex_ids[3*j]+2];
-                vertex2.x=scene.vertex_data[scene.vertex_ids[3*j+1]]; //coordinate of second vertex of triangle
-                vertex2.y=scene.vertex_data[scene.vertex_ids[3*j+1]+1];
-                vertex2.z=scene.vertex_data[scene.vertex_ids[3*j+1]+2];
-                vertex3.x=scene.vertex_data[scene.vertex_ids[3*j+2]]; //coordinate of third vertex of triangle
-                vertex3.y=scene.vertex_data[scene.vertex_ids[3*j+2]+1];
-                vertex3.z=scene.vertex_data[scene.vertex_ids[3*j+2]+2];
+                vertex1.x =scene.vertex_data[3*scene.vertex_ids[3*j]]; //coordinate of first vertex of triangle
+                vertex1.y =scene.vertex_data[3*scene.vertex_ids[3*j]+1];
+                vertex1.z=scene.vertex_data[3*scene.vertex_ids[3*j]+2];
+                vertex2.x=scene.vertex_data[3*scene.vertex_ids[3*j+1]]; //coordinate of second vertex of triangle
+                vertex2.y=scene.vertex_data[3*scene.vertex_ids[3*j+1]+1];
+                vertex2.z=scene.vertex_data[3*scene.vertex_ids[3*j+1]+2];
+                vertex3.x=scene.vertex_data[3*scene.vertex_ids[3*j+2]]; //coordinate of third vertex of triangle
+                vertex3.y=scene.vertex_data[3*scene.vertex_ids[3*j+2]+1];
+                vertex3.z=scene.vertex_data[3*scene.vertex_ids[3*j+2]+2];
                 triLine1=vertex2-vertex1; 
                 triLine2=vertex3-vertex2;
                 normal=triLine1.cross(triLine2).normalize();
