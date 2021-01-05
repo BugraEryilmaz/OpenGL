@@ -23,6 +23,73 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+void normal_vec(){
+    int i,j;
+    int x,y,z;
+    int counter;
+    GLfloat data_x,data_y,data_z,sum_x;
+    
+    for(i=0;i<scene.vertex_data.size()/3;i++){
+        counter=0;
+        for(j=0;j<scene.vertex_ids.size()/3;j++){
+            if(scene.vertex_ids[3*j]==i){
+                counter++;
+                data_x=scene.vertex_data[i];
+                data_y=scene.vertex_data[i+1];
+                data_z=scene.vertex_data[i+2];
+
+                //calculate normal
+                //sum+=normal
+            }
+            else if(scene.vertex_ids[3*j+1]==i){
+                counter++;
+                data_x=scene.vertex_data[i-1];
+                data_y=scene.vertex_data[i];
+                data_z=scene.vertex_data[i+1];
+                //calculate normal
+                //sum+=normal
+            }
+            else if(scene.vertex_ids[3*j+2]==i){
+                counter++;
+                data_x=scene.vertex_data[i-2];
+                data_y=scene.vertex_data[i-1];
+                data_z=scene.vertex_data[i];
+                //calculate normal
+                //sum+=normal
+            }
+            scene.normal_data[i]=sum_x;
+        }
+        
+    }
+    /*
+    int vertex_id_array[scene.vertex_ids.size()];
+    for(i=0;i<scene.vertex_data.size();i++){  
+        sum=0;
+        counter=0;
+        GLfloat a,b,c;
+        for(j=0;j<scene.vertex_id.size();j++)
+            if(scene.vertex_ids[3*j]==i){
+                 
+                 //calculate normal
+                 //sum+=normal;
+                 counter++;   
+            }
+            else if(scene.vertex_ids[3*j+1]==i){
+                //calculate normal
+                 //sum+=normal;
+               counter++ 
+            }
+            else if(scene.vertex_ids[3*j+2]==i){
+                //calculate normal
+                 //sum+=normal;
+                counter++
+            }
+
+        //scene.normal_data[i]=sum/normal;
+*/
+    
+}
+
 void setVBOs() {
     
 
