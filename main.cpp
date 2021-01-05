@@ -181,16 +181,18 @@ int main(int argc, char* argv[]) {
     //  color is determined by glmaterial code
     glEnable(GL_LIGHTING);
     glDisable(GL_COLOR_MATERIAL);
-    
     GLfloat light_ambient[] = { scene.ambient_light.x,scene.ambient_light.y,scene.ambient_light.z, 1.0 };
+    //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, light_ambient);
+
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHT0);
     for (int i=0; i<scene.point_lights.size();i++) {
         GLfloat light_diffuse[] = { scene.point_lights[i].intensity.x, scene.point_lights[i].intensity.y, scene.point_lights[i].intensity.z, 1.0 };
         GLfloat light_position[] = { scene.point_lights[i].position.x, scene.point_lights[i].position.y, scene.point_lights[i].position.z, 1.0 };
 
         glLightfv(GL_LIGHT0+i+1, GL_DIFFUSE, light_diffuse);
         glLightfv(GL_LIGHT0+i+1, GL_SPECULAR, light_diffuse);
+        glLightfv(GL_LIGHT0+i+1, GL_AMBIENT, light_ambient);
         //glLightf(GL_LIGHT0+i+1, GL_QUADRATIC_ATTENUATION, 1);
         glLightfv(GL_LIGHT0+i+1, GL_POSITION, light_position);
         glEnable(GL_LIGHT0+i+1);
@@ -205,7 +207,7 @@ int main(int argc, char* argv[]) {
     gluPerspective(fov, aspect, ndist, fdist);
     setVBOs();
     while(!glfwWindowShouldClose(win)) {
-glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
         for (int i = 0; i < scene.meshes.size(); i++)
             drawMesh(scene.meshes[i]);
         glfwPollEvents();
