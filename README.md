@@ -2,8 +2,8 @@
 
 - [ ]  Compute normal for vertex
 - [ ]  Face Culling
-- [ ]  Creating VertexBufferObjects
+- [x]  Creating VertexBufferObjects
 - [ ]  Show Fps in Title
 - [ ]  Draw mesh object
-    - [ ]  Calculate MVP matrix for a mesh
+    - [x]  Calculate MVP matrix for a mesh
     - [ ]  Lighting
