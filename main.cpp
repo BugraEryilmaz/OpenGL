@@ -61,6 +61,10 @@ void normal_vec(){
     } 
 }
 
+//glEnable(GL_CULL_FACE); 
+//glCullFace(GL_FRONT);
+//glCullFace(GL_BACK);
+
 void setVBOs() {
     
 
