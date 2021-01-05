@@ -27,11 +27,11 @@ void normal_vec(){
     int i,j;
     int x,y,z;
     int counter;
-    Vec3f  vertex1;
-    Vec3f  vertex2;
-    Vec3f  vertex3;
-    Vec3f triLine1, triLine2;
-    Vec3f normal,sum;
+    parser::Vec3f vertex1;
+    parser::Vec3f  vertex2;
+    parser::Vec3f  vertex3;
+    parser::Vec3f triLine1, triLine2;
+    parser::Vec3f normal,sum;
     sum.x=0;
     sum.y=0;
     sum.z=0;
@@ -52,7 +52,7 @@ void normal_vec(){
                 triLine1=vertex2-vertex1; 
                 triLine2=vertex3-vertex2;
                 normal=triLine1.cross(triLine2).normalize();
-                sum+=normal;
+                sum=sum+normal;
             }
         }
           scene.normal_data[3*i]=sum.x/counter;
