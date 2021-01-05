@@ -36,7 +36,7 @@ void normal_vec(){
     parser::Vec3f  vertex2;
     parser::Vec3f  vertex3;
     parser::Vec3f triLine1, triLine2;
-    parser::Vec3f normal,sum;
+    parser::Vec3f normal,sum; //merge
     for(i=0;i<scene.vertex_data.size()/3;i++){
         counter=0;
         sum.x=0;
