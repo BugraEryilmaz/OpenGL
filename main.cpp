@@ -27,67 +27,38 @@ void normal_vec(){
     int i,j;
     int x,y,z;
     int counter;
-    GLfloat data_x,data_y,data_z,sum_x;
-    
+    Vec3f  vertex1;
+    Vec3f  vertex2;
+    Vec3f  vertex3;
+    Vec3f triLine1, triLine2;
+    Vec3f normal,sum;
+    sum.x=0;
+    sum.y=0;
+    sum.z=0;
     for(i=0;i<scene.vertex_data.size()/3;i++){
         counter=0;
         for(j=0;j<scene.vertex_ids.size()/3;j++){
-            if(scene.vertex_ids[3*j]==i){
+            if(scene.vertex_ids[3*j]==i || scene.vertex_ids[3*j+1]==i || scene.vertex_ids[3*j+2]==i){
                 counter++;
-                data_x=scene.vertex_data[i];
-                data_y=scene.vertex_data[i+1];
-                data_z=scene.vertex_data[i+2];
-
-                //calculate normal
-                //sum+=normal
+                vertex1.x =scene.vertex_data[scene.vertex_ids[3*j]]; //coordinate of first vertex of triangle
+                vertex1.y =scene.vertex_data[scene.vertex_ids[3*j]+1];
+                vertex1.z=scene.vertex_data[scene.vertex_ids[3*j]+2];
+                vertex2.x=scene.vertex_data[scene.vertex_ids[3*j+1]]; //coordinate of second vertex of triangle
+                vertex2.y=scene.vertex_data[scene.vertex_ids[3*j+1]+1];
+                vertex2.z=scene.vertex_data[scene.vertex_ids[3*j+1]+2];
+                vertex3.x=scene.vertex_data[scene.vertex_ids[3*j+2]]; //coordinate of third vertex of triangle
+                vertex3.y=scene.vertex_data[scene.vertex_ids[3*j+2]+1];
+                vertex3.z=scene.vertex_data[scene.vertex_ids[3*j+2]+2];
+                triLine1=vertex2-vertex1; 
+                triLine2=vertex3-vertex2;
+                normal=triLine1.cross(triLine2).normalize();
+                sum+=normal;
             }
-            else if(scene.vertex_ids[3*j+1]==i){
-                counter++;
-                data_x=scene.vertex_data[i-1];
-                data_y=scene.vertex_data[i];
-                data_z=scene.vertex_data[i+1];
-                //calculate normal
-                //sum+=normal
-            }
-            else if(scene.vertex_ids[3*j+2]==i){
-                counter++;
-                data_x=scene.vertex_data[i-2];
-                data_y=scene.vertex_data[i-1];
-                data_z=scene.vertex_data[i];
-                //calculate normal
-                //sum+=normal
-            }
-            scene.normal_data[i]=sum_x;
         }
-        
-    }
-    /*
-    int vertex_id_array[scene.vertex_ids.size()];
-    for(i=0;i<scene.vertex_data.size();i++){  
-        sum=0;
-        counter=0;
-        GLfloat a,b,c;
-        for(j=0;j<scene.vertex_id.size();j++)
-            if(scene.vertex_ids[3*j]==i){
-                 
-                 //calculate normal
-                 //sum+=normal;
-                 counter++;   
-            }
-            else if(scene.vertex_ids[3*j+1]==i){
-                //calculate normal
-                 //sum+=normal;
-               counter++ 
-            }
-            else if(scene.vertex_ids[3*j+2]==i){
-                //calculate normal
-                 //sum+=normal;
-                counter++
-            }
-
-        //scene.normal_data[i]=sum/normal;
-*/
-    
+          scene.normal_data[3*i]=sum.x/counter;
+          scene.normal_data[3*i+1]=sum.y/counter;
+          scene.normal_data[3*i+2]=sum.z/counter;
+    } 
 }
 
 void setVBOs() {
