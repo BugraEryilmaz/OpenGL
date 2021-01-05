@@ -37,11 +37,12 @@ void normal_vec(){
     parser::Vec3f  vertex3;
     parser::Vec3f triLine1, triLine2;
     parser::Vec3f normal,sum;
-    sum.x=0;
-    sum.y=0;
-    sum.z=0;
+    
     for(i=0;i<scene.vertex_data.size()/3;i++){
         counter=0;
+        sum.x=0;
+        sum.y=0;
+        sum.z=0;
         for(j=0;j<scene.vertex_ids.size()/3;j++){
             if(scene.vertex_ids[3*j]==i || scene.vertex_ids[3*j+1]==i || scene.vertex_ids[3*j+2]==i){
                 counter++;
