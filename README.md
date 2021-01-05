@@ -4,6 +4,6 @@
 - [ ]  Face Culling
 - [x]  Creating VertexBufferObjects
 - [ ]  Show Fps in Title
-- [ ]  Draw mesh object
+- [x]  Draw mesh object
     - [x]  Calculate MVP matrix for a mesh
-    - [ ]  Lighting
+    - [x]  Lighting

@@ -85,14 +85,10 @@ void drawMesh(parser::Mesh &mesh) {
     GLfloat diffColor [ 4 ] = {material.diffuse.x, material.diffuse.y, material.diffuse.z, 1.0 } ;
     GLfloat specColor [ 4 ] = {material.specular.x, material.specular.y, material.specular.z, 1.0 } ;
     GLfloat specExp [ 1 ] = {material.phong_exponent};
-    glMaterialfv ( GL_FRONT , GL_AMBIENT , ambColor ) ;
-    glMaterialfv ( GL_FRONT , GL_DIFFUSE , diffColor ) ;
-    glMaterialfv ( GL_FRONT , GL_SPECULAR , specColor ) ;
-    glMaterialfv ( GL_FRONT , GL_SHININESS , specExp ) ;
-    glMaterialfv ( GL_BACK , GL_AMBIENT , ambColor ) ;
-    glMaterialfv ( GL_BACK , GL_DIFFUSE , diffColor ) ;
-    glMaterialfv ( GL_BACK , GL_SPECULAR , specColor ) ;
-    glMaterialfv ( GL_BACK , GL_SHININESS , specExp ) ;
+    glMaterialfv ( GL_FRONT_AND_BACK , GL_AMBIENT , ambColor ) ;
+    glMaterialfv ( GL_FRONT_AND_BACK , GL_DIFFUSE , diffColor ) ;
+    glMaterialfv ( GL_FRONT_AND_BACK , GL_SPECULAR , specColor ) ;
+    glMaterialfv ( GL_FRONT_AND_BACK , GL_SHININESS , specExp ) ;
 
 	glVertexPointer(3, GL_FLOAT, 0, (void*)0);
     glNormalPointer(GL_FLOAT, 0, (void*)vertexPosSize);
@@ -128,28 +124,32 @@ int main(int argc, char* argv[]) {
 
     glfwSetKeyCallback(win, keyCallback);
 
+    glEnable(GL_SMOOTH);
+
     //  color is determined by glmaterial code
     glEnable(GL_LIGHTING);
     glDisable(GL_COLOR_MATERIAL);
-    GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_position[] = { 0, 0, 0, 0.0 };
-
+    GLfloat light_ambient[] = { scene.ambient_light.x,scene.ambient_light.y,scene.ambient_light.z, 1.0 };
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
     glEnable(GL_LIGHT0);
+    for (int i=0; i<scene.point_lights.size();i++) {
+        GLfloat light_diffuse[] = { scene.point_lights[i].intensity.x, scene.point_lights[i].intensity.y, scene.point_lights[i].intensity.z, 1.0 };
+        GLfloat light_position[] = { scene.point_lights[i].position.x, scene.point_lights[i].position.y, scene.point_lights[i].position.z, 1 };
+
+        glLightfv(GL_LIGHT0+i+1, GL_DIFFUSE, light_diffuse);
+        glLightfv(GL_LIGHT0+i+1, GL_SPECULAR, light_diffuse);
+        glLightf(GL_LIGHT0+i+1, GL_QUADRATIC_ATTENUATION, 1);
+        glLightfv(GL_LIGHT0+i+1, GL_POSITION, light_position);
+        glEnable(GL_LIGHT0+i+1);
+    }
     fov = fabs(atan(scene.camera.near_plane.z/scene.camera.near_distance))+fabs(atan(scene.camera.near_plane.w/scene.camera.near_distance));
     fov = fov * 180 / M_PI;
     aspect = scene.camera.image_width/scene.camera.image_height;
     ndist = scene.camera.near_distance;
     fdist = scene.camera.far_distance;
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        printf("%f",fov);
-        gluPerspective(fov, aspect, ndist, fdist);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(fov, aspect, ndist, fdist);
     setVBOs();
     while(!glfwWindowShouldClose(win)) {
         for (int i = 0; i < scene.meshes.size(); i++)
