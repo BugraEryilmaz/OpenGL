@@ -139,10 +139,6 @@ void drawMesh(parser::Mesh &mesh) {
     GLfloat diffColor [ 4 ] = {material.diffuse.x, material.diffuse.y, material.diffuse.z, 1.0 } ;
     GLfloat specColor [ 4 ] = {material.specular.x, material.specular.y, material.specular.z, 1.0 } ;
     GLfloat specExp [ 1 ] = {material.phong_exponent};
-    //GLfloat ambColor [ 4 ] = {0,0,0, 1.0 } ;
-    //GLfloat diffColor [ 4 ] = {0,0,0, 1.0 } ;
-    //GLfloat specColor [ 4 ] = {0,0,0, 1.0 } ;
-    //GLfloat specExp [ 1 ] = {1};
     glMaterialfv ( GL_FRONT_AND_BACK , GL_AMBIENT , ambColor ) ;
     glMaterialfv ( GL_FRONT_AND_BACK , GL_DIFFUSE , diffColor ) ;
     glMaterialfv ( GL_FRONT_AND_BACK , GL_SPECULAR , specColor ) ;
@@ -168,7 +164,7 @@ void showFPS(GLFWwindow* pWindow)
 
         double fps = ((double)(nbFrames)) / delta;
 
-        sprintf(ss, "Spheres. %lf FPS", fps);
+        sprintf(ss, "CENG477 - HW3 [%lf FPS]", fps);
 
         glfwSetWindowTitle(pWindow, ss);
 
@@ -211,9 +207,7 @@ int main(int argc, char* argv[]) {
     //glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, 1.0);
     glEnable(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);  
-    glDisable(GL_CULL_FACE); 
-    //glCullFace(GL_FRONT);
-    //glCullFace(GL_BACK);
+    FaceCulling();
 
 
     //  color is determined by glmaterial code
@@ -222,18 +216,17 @@ int main(int argc, char* argv[]) {
     GLfloat light_ambient[] = { scene.ambient_light.x,scene.ambient_light.y,scene.ambient_light.z, 1.0 };
     //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, light_ambient);
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    //glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     //glEnable(GL_LIGHT0);
     for (int i=0; i<scene.point_lights.size();i++) {
         GLfloat light_diffuse[] = { scene.point_lights[i].intensity.x, scene.point_lights[i].intensity.y, scene.point_lights[i].intensity.z, 1.0 };
         GLfloat light_position[] = { scene.point_lights[i].position.x, scene.point_lights[i].position.y, scene.point_lights[i].position.z, 1.0 };
 
-        glLightfv(GL_LIGHT0+i+1, GL_DIFFUSE, light_diffuse);
-        glLightfv(GL_LIGHT0+i+1, GL_SPECULAR, light_diffuse);
-        glLightfv(GL_LIGHT0+i+1, GL_AMBIENT, light_ambient);
-        //glLightf(GL_LIGHT0+i+1, GL_QUADRATIC_ATTENUATION, 1);
-        glLightfv(GL_LIGHT0+i+1, GL_POSITION, light_position);
-        glEnable(GL_LIGHT0+i+1);
+        glLightfv(GL_LIGHT0+i, GL_DIFFUSE, light_diffuse);
+        glLightfv(GL_LIGHT0+i, GL_SPECULAR, light_diffuse);
+        glLightfv(GL_LIGHT0+i, GL_AMBIENT, light_ambient);
+        glLightfv(GL_LIGHT0+i, GL_POSITION, light_position);
+        glEnable(GL_LIGHT0+i);
     }
     fov = fabs(atan(scene.camera.near_plane.z/scene.camera.near_distance))+fabs(atan(scene.camera.near_plane.w/scene.camera.near_distance));
     fov = fov * 180 / M_PI;
@@ -249,12 +242,12 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < scene.meshes.size(); i++)
             drawMesh(scene.meshes[i]);
         glfwPollEvents();
+        showFPS(win);
         glfwSwapBuffers(win);
     }
 
     glfwDestroyWindow(win);
     glfwTerminate();
     exit(EXIT_SUCCESS);
-
     return 0;
 }
