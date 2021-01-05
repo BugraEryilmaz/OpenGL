@@ -66,7 +66,7 @@ struct Vec3f {
     Vec3f normalize()
     {
         double len;
-        len = std::sqrt(x * x + y * y + z * z);
+        len = sqrt(x * x + y * y + z * z);
         Vec3f ret;
         ret.x = x / len;
         ret.y = y / len;

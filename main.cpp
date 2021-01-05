@@ -37,23 +37,23 @@ void normal_vec(){
     parser::Vec3f  vertex3;
     parser::Vec3f triLine1, triLine2;
     parser::Vec3f normal,sum;
-    sum.x=0;
-    sum.y=0;
-    sum.z=0;
     for(i=0;i<scene.vertex_data.size()/3;i++){
         counter=0;
+        sum.x=0;
+        sum.y=0;
+        sum.z=0;
         for(j=0;j<scene.vertex_ids.size()/3;j++){
             if(scene.vertex_ids[3*j]==i || scene.vertex_ids[3*j+1]==i || scene.vertex_ids[3*j+2]==i){
                 counter++;
-                vertex1.x =scene.vertex_data[scene.vertex_ids[3*j]]; //coordinate of first vertex of triangle
-                vertex1.y =scene.vertex_data[scene.vertex_ids[3*j]+1];
-                vertex1.z=scene.vertex_data[scene.vertex_ids[3*j]+2];
-                vertex2.x=scene.vertex_data[scene.vertex_ids[3*j+1]]; //coordinate of second vertex of triangle
-                vertex2.y=scene.vertex_data[scene.vertex_ids[3*j+1]+1];
-                vertex2.z=scene.vertex_data[scene.vertex_ids[3*j+1]+2];
-                vertex3.x=scene.vertex_data[scene.vertex_ids[3*j+2]]; //coordinate of third vertex of triangle
-                vertex3.y=scene.vertex_data[scene.vertex_ids[3*j+2]+1];
-                vertex3.z=scene.vertex_data[scene.vertex_ids[3*j+2]+2];
+                vertex1.x =scene.vertex_data[3*scene.vertex_ids[3*j]]; //coordinate of first vertex of triangle
+                vertex1.y =scene.vertex_data[3*scene.vertex_ids[3*j]+1];
+                vertex1.z=scene.vertex_data[3*scene.vertex_ids[3*j]+2];
+                vertex2.x=scene.vertex_data[3*scene.vertex_ids[3*j+1]]; //coordinate of second vertex of triangle
+                vertex2.y=scene.vertex_data[3*scene.vertex_ids[3*j+1]+1];
+                vertex2.z=scene.vertex_data[3*scene.vertex_ids[3*j+1]+2];
+                vertex3.x=scene.vertex_data[3*scene.vertex_ids[3*j+2]]; //coordinate of third vertex of triangle
+                vertex3.y=scene.vertex_data[3*scene.vertex_ids[3*j+2]+1];
+                vertex3.z=scene.vertex_data[3*scene.vertex_ids[3*j+2]+2];
                 triLine1=vertex2-vertex1; 
                 triLine2=vertex3-vertex2;
                 normal=triLine1.cross(triLine2).normalize();
@@ -127,10 +127,14 @@ void drawMesh(parser::Mesh &mesh) {
     GLfloat diffColor [ 4 ] = {material.diffuse.x, material.diffuse.y, material.diffuse.z, 1.0 } ;
     GLfloat specColor [ 4 ] = {material.specular.x, material.specular.y, material.specular.z, 1.0 } ;
     GLfloat specExp [ 1 ] = {material.phong_exponent};
-    glMaterialfv ( GL_FRONT_AND_BACK , GL_AMBIENT , ambColor ) ;
-    glMaterialfv ( GL_FRONT_AND_BACK , GL_DIFFUSE , diffColor ) ;
-    glMaterialfv ( GL_FRONT_AND_BACK , GL_SPECULAR , specColor ) ;
-    glMaterialfv ( GL_FRONT_AND_BACK , GL_SHININESS , specExp ) ;
+    //GLfloat ambColor [ 4 ] = {0,0,0, 1.0 } ;
+    //GLfloat diffColor [ 4 ] = {0,0,0, 1.0 } ;
+    //GLfloat specColor [ 4 ] = {0,0,0, 1.0 } ;
+    //GLfloat specExp [ 1 ] = {1};
+    glMaterialfv ( GL_FRONT , GL_AMBIENT , ambColor ) ;
+    glMaterialfv ( GL_FRONT , GL_DIFFUSE , diffColor ) ;
+    glMaterialfv ( GL_FRONT , GL_SPECULAR , specColor ) ;
+    glMaterialfv ( GL_FRONT , GL_SHININESS , specExp ) ;
 
 	glVertexPointer(3, GL_FLOAT, 0, (void*)0);
     glNormalPointer(GL_FLOAT, 0, (void*)vertexPosSize);
@@ -139,6 +143,7 @@ void drawMesh(parser::Mesh &mesh) {
 
 int main(int argc, char* argv[]) {
     scene.loadFromXml(argv[1]);
+    normal_vec();
     glfwSetErrorCallback(errorCallback);
 
     if (!glfwInit()) {
@@ -171,6 +176,7 @@ int main(int argc, char* argv[]) {
     //  color is determined by glmaterial code
     glEnable(GL_LIGHTING);
     glDisable(GL_COLOR_MATERIAL);
+    
     GLfloat light_ambient[] = { scene.ambient_light.x,scene.ambient_light.y,scene.ambient_light.z, 1.0 };
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glEnable(GL_LIGHT0);
@@ -180,7 +186,7 @@ int main(int argc, char* argv[]) {
 
         glLightfv(GL_LIGHT0+i+1, GL_DIFFUSE, light_diffuse);
         glLightfv(GL_LIGHT0+i+1, GL_SPECULAR, light_diffuse);
-        glLightf(GL_LIGHT0+i+1, GL_QUADRATIC_ATTENUATION, 1);
+        //glLightf(GL_LIGHT0+i+1, GL_QUADRATIC_ATTENUATION, 1);
         glLightfv(GL_LIGHT0+i+1, GL_POSITION, light_position);
         glEnable(GL_LIGHT0+i+1);
     }
