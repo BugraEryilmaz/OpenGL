@@ -33,8 +33,8 @@ void normal_vec(){
     int x,y,z;
     int counter;
     parser::Vec3f vertex1;
-    parser::Vec3f  vertex2;
-    parser::Vec3f  vertex3;
+    parser::Vec3f vertex2;
+    parser::Vec3f vertex3;
     parser::Vec3f triLine1, triLine2;
     parser::Vec3f normal,sum;
     
@@ -46,8 +46,8 @@ void normal_vec(){
         for(j=0;j<scene.vertex_ids.size()/3;j++){
             if(scene.vertex_ids[3*j]==i || scene.vertex_ids[3*j+1]==i || scene.vertex_ids[3*j+2]==i){
                 counter++;
-                vertex1.x =scene.vertex_data[3*scene.vertex_ids[3*j]]; //coordinate of first vertex of triangle
-                vertex1.y =scene.vertex_data[3*scene.vertex_ids[3*j]+1];
+                vertex1.x=scene.vertex_data[3*scene.vertex_ids[3*j]]; //coordinate of first vertex of triangle
+                vertex1.y=scene.vertex_data[3*scene.vertex_ids[3*j]+1];
                 vertex1.z=scene.vertex_data[3*scene.vertex_ids[3*j]+2];
                 vertex2.x=scene.vertex_data[3*scene.vertex_ids[3*j+1]]; //coordinate of second vertex of triangle
                 vertex2.y=scene.vertex_data[3*scene.vertex_ids[3*j+1]+1];
@@ -55,7 +55,7 @@ void normal_vec(){
                 vertex3.x=scene.vertex_data[3*scene.vertex_ids[3*j+2]]; //coordinate of third vertex of triangle
                 vertex3.y=scene.vertex_data[3*scene.vertex_ids[3*j+2]+1];
                 vertex3.z=scene.vertex_data[3*scene.vertex_ids[3*j+2]+2];
-                triLine1=vertex2-vertex1; 
+                triLine1=vertex2-vertex1;  
                 triLine2=vertex3-vertex2;
                 normal=triLine1.cross(triLine2).normalize();
                 sum=sum+normal;
@@ -67,9 +67,22 @@ void normal_vec(){
     } 
 }
 
+ void FaceCulling(){
+    if(scene.culling_enabled==1){
+        glEnable(GL_CULL_FACE); 
+        if(scene.culling_face==0)
+            glCullFace(GL_BACK);
+        else
+            glCullFace(GL_FRONT);
+    }
+    else
+        glDisable(GL_CULL_FACE);
+    
+}
 //glEnable(GL_CULL_FACE); 
 //glCullFace(GL_FRONT);
 //glCullFace(GL_BACK);
+//glDisable(GL_CULL_FACE);
 
 void setVBOs() {
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -141,6 +154,8 @@ void drawMesh(parser::Mesh &mesh) {
     glNormalPointer(GL_FLOAT, 0, (void*)vertexPosSize);
 	glDrawElements(GL_TRIANGLES, mesh.numberofVertex, GL_UNSIGNED_INT, (void*)(mesh.vertexIDstart*sizeof(GLuint)));
 }
+
+
 
 int main(int argc, char* argv[]) {
     scene.loadFromXml(argv[1]);
