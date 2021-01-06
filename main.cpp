@@ -2,7 +2,6 @@
 #define _USE_MATH_DEFINES
 #include <stdlib.h>
 #include <cassert>
-#include "linmath.h"
 #define GLEW_STATIC 
 #include "parser.h"
 //////-------- Global Variables -------/////////
@@ -234,7 +233,7 @@ int main(int argc, char* argv[]) {
     }
     fov = fabs(atan(scene.camera.near_plane.z/scene.camera.near_distance))+fabs(atan(scene.camera.near_plane.w/scene.camera.near_distance));
     fov = fov * 180 / M_PI;
-    aspect = scene.camera.image_width/scene.camera.image_height;
+    aspect = (scene.camera.near_plane.y-scene.camera.near_plane.x)/(scene.camera.near_plane.w-scene.camera.near_plane.z);
     ndist = scene.camera.near_distance;
     fdist = scene.camera.far_distance;
     glMatrixMode(GL_PROJECTION);
