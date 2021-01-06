@@ -60,9 +60,13 @@ void normal_vec(){
                 sum=sum+normal;
             }
         }
-          scene.normal_data[3*i]=sum.x/counter;
-          scene.normal_data[3*i+1]=sum.y/counter;
-          scene.normal_data[3*i+2]=sum.z/counter;
+        sum.x=sum.x/counter;
+        sum.y=sum.y/counter;
+        sum.z=sum.z/counter;
+        sum = sum.normalize();
+        scene.normal_data[3*i]=sum.x;
+        scene.normal_data[3*i+1]=sum.y;
+        scene.normal_data[3*i+2]=sum.z;
     } 
 }
 
@@ -209,7 +213,7 @@ int main(int argc, char* argv[]) {
     glEnable(GL_DEPTH_TEST);  
     FaceCulling();
 
-
+    glClearColor(scene.background_color.x,scene.background_color.y,scene.background_color.z,1.0);
     //  color is determined by glmaterial code
     glEnable(GL_LIGHTING);
     glDisable(GL_COLOR_MATERIAL);
